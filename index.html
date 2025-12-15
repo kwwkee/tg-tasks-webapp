@@ -503,21 +503,6 @@
             padding: 40px;
             color: #aaa;
         }
-
-        .loading-spinner {
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top: 3px solid #00ff88;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body>
@@ -578,7 +563,7 @@
                     <span id="profileAvatarIcon">👤</span>
                 </div>
                 <div class="profile-id" id="profileId">#12345678</div>
-                <div class="profile-name" id="profileName">Loading...</div>
+                <div class="profile-name" id="profileName">...</div>
             </div>
 
             <div class="balance-card">
@@ -590,7 +575,7 @@
 
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-label">Завершено заданий</div>
+                    <div class="stat-label">Завершено</div>
                     <div class="stat-value" id="statCompleted">0</div>
                 </div>
                 <div class="stat-card">
@@ -612,10 +597,7 @@
             </div>
 
             <div id="tasks-container">
-                <div class="loading">
-                    <div class="loading-spinner"></div>
-                    Загрузка заданий...
-                </div>
+                <div class="loading">Загрузка заданий...</div>
             </div>
         </div>
     </div>
@@ -625,11 +607,10 @@
         tg.expand();
         tg.setHeaderColor('#1a1f3a');
         tg.setBackgroundColor('#1a1f3a');
-
-        const API_URL = 'http://localhost:3000/api';
         
         let userData = null;
         let allTasks = [];
+        let userTasks = {};
         let currentCategory = 'all';
         let telegramId = null;
 
@@ -671,6 +652,31 @@
             }, 3000);
         }
 
+        // Работа с Cloud Storage
+        async function saveToCloud(key, data) {
+            return new Promise((resolve) => {
+                tg.CloudStorage.setItem(key, JSON.stringify(data), (err, success) => {
+                    resolve(!err);
+                });
+            });
+        }
+
+        async function loadFromCloud(key) {
+            return new Promise((resolve) => {
+                tg.CloudStorage.getItem(key, (err, value) => {
+                    if (err || !value) {
+                        resolve(null);
+                    } else {
+                        try {
+                            resolve(JSON.parse(value));
+                        } catch {
+                            resolve(null);
+                        }
+                    }
+                });
+            });
+        }
+
         // Регистрация
         async function createProfile() {
             const nickname = document.getElementById('nicknameInput').value.trim();
@@ -691,73 +697,96 @@
                 return;
             }
 
-            try {
-                const response = await fetch(`${API_URL}/user/create`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ telegramId, nickname })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    document.getElementById('registrationModal').style.display = 'none';
-                    await init();
-                    showNotification('Профиль создан! 🎉');
-                } else {
-                    errorEl.textContent = result.error;
-                    errorEl.style.display = 'block';
-                    inputEl.classList.add('input-error');
-                }
-            } catch (err) {
-                errorEl.textContent = 'Ошибка сервера';
-                errorEl.style.display = 'block';
-                inputEl.classList.add('input-error');
-            }
+            userData = {
+                telegramId,
+                nickname,
+                balance: 0,
+                createdAt: new Date().toISOString()
+            };
+
+            await saveToCloud('user_data', userData);
+            document.getElementById('registrationModal').style.display = 'none';
+            updateProfile();
+            showNotification('Профиль создан! 🎉');
         }
 
-        // Загрузка данных пользователя
+        // Загрузка данных
         async function loadUserData() {
-            try {
-                const response = await fetch(`${API_URL}/user/${telegramId}`);
-                const data = await response.json();
-                
-                if (!data.exists) {
-                    document.getElementById('registrationModal').style.display = 'flex';
-                    return false;
-                }
-                
-                userData = data.user;
-                updateProfile();
-                return true;
-            } catch (err) {
-                console.error('Ошибка загрузки пользователя:', err);
+            userData = await loadFromCloud('user_data');
+            
+            if (!userData) {
+                document.getElementById('registrationModal').style.display = 'flex';
                 return false;
             }
+            
+            updateProfile();
+            return true;
+        }
+
+        async function loadUserTasks() {
+            userTasks = await loadFromCloud('user_tasks') || {};
         }
 
         function updateProfile() {
             if (!userData) return;
             
             document.getElementById('profileName').textContent = userData.nickname;
-            document.getElementById('profileId').textContent = `#${userData.telegram_id}`;
+            document.getElementById('profileId').textContent = `#${telegramId}`;
             document.getElementById('profileBalance').textContent = userData.balance;
-            document.getElementById('statCompleted').textContent = userData.completedTasks || 0;
             
-            const checking = allTasks.filter(t => t.user_status === 'checking').length;
+            const completed = Object.values(userTasks).filter(t => t.status === 'completed').length;
+            const checking = Object.values(userTasks).filter(t => t.status === 'checking').length;
+            
+            document.getElementById('statCompleted').textContent = completed;
             document.getElementById('statChecking').textContent = checking;
         }
 
-        // Загрузка заданий
-        async function loadTasks() {
-            try {
-                const response = await fetch(`${API_URL}/tasks/${telegramId}`);
-                const data = await response.json();
-                allTasks = data.tasks;
-                renderTasks();
-            } catch (err) {
-                console.error('Ошибка загрузки заданий:', err);
-            }
+        // Задания (демо данные - в будущем можно загружать с сервера)
+        function loadTasks() {
+            allTasks = [
+                {
+                    id: 'task_1',
+                    title: 'Первая ставка',
+                    description: 'Сделай свою первую ставку на любое событие',
+                    reward: 200,
+                    category: 'CS2',
+                    icon: '🎮'
+                },
+                {
+                    id: 'task_2',
+                    title: 'Поделись в соцсетях',
+                    description: 'Поделись нашим ботом с друзьями',
+                    reward: 150,
+                    category: 'Социальные',
+                    icon: '📱'
+                },
+                {
+                    id: 'task_3',
+                    title: 'Турнир недели',
+                    description: 'Участвуй в турнире Dota 2',
+                    reward: 500,
+                    category: 'Dota 2',
+                    icon: '🏆'
+                },
+                {
+                    id: 'task_4',
+                    title: 'Подписка на канал',
+                    description: 'Подпишись на наш Telegram канал',
+                    reward: 100,
+                    category: 'Социальные',
+                    icon: '📢'
+                },
+                {
+                    id: 'task_5',
+                    title: 'Матч дня CS2',
+                    description: 'Сделай ставку на матч дня в CS2',
+                    reward: 300,
+                    category: 'CS2',
+                    icon: '🔫'
+                }
+            ];
+            
+            renderTasks();
         }
 
         function renderTasks() {
@@ -778,7 +807,8 @@
             }
 
             container.innerHTML = filteredTasks.map(task => {
-                const status = task.user_status || 'new';
+                const userTask = userTasks[task.id];
+                const status = userTask?.status || 'new';
                 
                 let statusBadge = '';
                 let buttonHtml = '';
@@ -818,45 +848,40 @@
         }
 
         async function acceptTask(taskId) {
-            try {
-                const response = await fetch(`${API_URL}/task/accept`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ telegramId, taskId })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    await loadTasks();
-                    showNotification('Задание принято! Выполни его и отправь на проверку', '📝');
-                } else {
-                    showNotification(result.error, '❌');
-                }
-            } catch (err) {
-                showNotification('Ошибка сервера', '❌');
+            if (!userData) {
+                showNotification('Сначала создай профиль', '❌');
+                return;
             }
+
+            userTasks[taskId] = {
+                status: 'pending',
+                acceptedAt: new Date().toISOString()
+            };
+            
+            await saveToCloud('user_tasks', userTasks);
+            renderTasks();
+            showNotification('Задание принято! Выполни его и отправь на проверку', '📝');
         }
 
         async function submitTask(taskId) {
-            try {
-                const response = await fetch(`${API_URL}/task/submit`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ telegramId, taskId })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    await loadTasks();
-                    showNotification('Задание отправлено на проверку! ⏳', '📤');
-                } else {
-                    showNotification(result.error, '❌');
-                }
-            } catch (err) {
-                showNotification('Ошибка сервера', '❌');
-            }
+            userTasks[taskId].status = 'checking';
+            userTasks[taskId].submittedAt = new Date().toISOString();
+            
+            await saveToCloud('user_tasks', userTasks);
+            renderTasks();
+            updateProfile();
+            
+            // Отправляем уведомление боту
+            const task = allTasks.find(t => t.id === taskId);
+            tg.sendData(JSON.stringify({
+                action: 'task_submitted',
+                taskId,
+                taskTitle: task.title,
+                userId: telegramId,
+                nickname: userData.nickname
+            }));
+            
+            showNotification('Задание отправлено на проверку! ⏳', '📤');
         }
 
         // Табы
@@ -885,16 +910,17 @@
                 const emoji = user.first_name?.[0] || '👤';
                 document.getElementById('userAvatarIcon').textContent = emoji;
                 document.getElementById('profileAvatarIcon').textContent = emoji;
-                
-                const userLoaded = await loadUserData();
-                if (userLoaded) {
-                    await loadTasks();
-                }
             } else {
-                // Для теста без Telegram
+                // Для теста
                 telegramId = 123456789;
-                await loadUserData();
-                await loadTasks();
+            }
+
+            await loadUserTasks();
+            const userExists = await loadUserData();
+            loadTasks();
+            
+            if (userExists) {
+                updateProfile();
             }
         }
 

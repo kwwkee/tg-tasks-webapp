@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Задания</title>
+    <title>L1GA PASS</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -16,6 +16,93 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #1a1f3a 0%, #2d3561 100%);
             color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Бургер меню */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: #1a1f3a;
+            z-index: 1000;
+            transition: left 0.3s;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+        }
+
+        .menu-overlay.active {
+            left: 0;
+        }
+
+        .menu-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .menu-backdrop.active {
+            display: block;
+        }
+
+        .menu-close {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 30px;
+        }
+
+        .menu-items {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .menu-item.active {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: #00ff88;
+        }
+
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .menu-item-icon {
+            font-size: 24px;
+        }
+
+        .menu-item-text {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Контейнер приложения */
+        .app-container {
             padding: 20px;
             min-height: 100vh;
         }
@@ -27,35 +114,150 @@
             margin-bottom: 30px;
         }
 
-        .logo {
+        .burger-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 24px;
+        }
+
+        .logo {
+            font-size: 20px;
             font-weight: bold;
         }
 
         .logo span {
             background: #00ff88;
             color: #000;
-            padding: 4px 12px;
+            padding: 4px 10px;
             border-radius: 6px;
             margin-left: 5px;
         }
 
-        .balance {
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
-            gap: 8px;
-            background: rgba(0, 255, 136, 0.1);
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .balance::before {
-            content: '💰';
+            justify-content: center;
             font-size: 20px;
+            cursor: pointer;
         }
 
+        /* Страницы */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Профиль */
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .profile-id {
+            color: #00ff88;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #2a3555 0%, #1f2744 100%);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .balance-label {
+            color: #00ff88;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .balance-amount {
+            font-size: 36px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #2a3555 0%, #1f2744 100%);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #aaa;
+            font-size: 12px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .stat-rank {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-profile {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Задания */
         h1 {
             font-size: 32px;
             margin-bottom: 20px;
@@ -160,37 +362,9 @@
             font-weight: 600;
         }
 
-        .task-status.on-pause {
-            background: rgba(255, 68, 68, 0.2);
-            color: #ff4444;
-        }
-
         .task-status.completed-status {
             background: rgba(0, 255, 136, 0.2);
             color: #00ff88;
-        }
-
-        .task-progress {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-            font-size: 14px;
-            color: #aaa;
-        }
-
-        .progress-bar {
-            flex: 1;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #00ff88;
-            transition: width 0.3s;
         }
 
         .task-title {
@@ -232,44 +406,156 @@
             cursor: not-allowed;
         }
 
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #aaa;
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: linear-gradient(135deg, #2a3555 0%, #1f2744 100%);
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            z-index: 2000;
+            transition: transform 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #aaa;
+        .notification.show {
+            transform: translateX(-50%) translateY(0);
         }
 
-        .empty-state-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
+        .notification-icon {
+            font-size: 24px;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">
-            L1GA<span>PASS</span>
+    <!-- Меню -->
+    <div class="menu-backdrop" id="menuBackdrop" onclick="closeMenu()"></div>
+    <div class="menu-overlay" id="menuOverlay">
+        <button class="menu-close" onclick="closeMenu()">✕</button>
+        
+        <div class="menu-items">
+            <div class="menu-item active" data-page="tasks">
+                <span class="menu-item-icon">🎮</span>
+                <span class="menu-item-text">Задания</span>
+            </div>
+            <div class="menu-item" data-page="profile">
+                <span class="menu-item-icon">👤</span>
+                <span class="menu-item-text">Профиль</span>
+            </div>
+            <div class="menu-item" data-page="season">
+                <span class="menu-item-icon">🎫</span>
+                <span class="menu-item-text">Season Pass</span>
+            </div>
+            <div class="menu-item" data-page="shop">
+                <span class="menu-item-icon">🛒</span>
+                <span class="menu-item-text">Магазин</span>
+            </div>
+            <div class="menu-item" data-page="rating">
+                <span class="menu-item-icon">🏆</span>
+                <span class="menu-item-text">Рейтинг</span>
+            </div>
         </div>
-        <div class="balance" id="balance">0</div>
     </div>
 
-    <h1>Задания</h1>
-
-    <div class="tabs">
-        <button class="tab active" data-category="all">Все</button>
-        <button class="tab" data-category="CS2">CS2</button>
-        <button class="tab" data-category="Dota 2">Dota 2</button>
-        <button class="tab" data-category="Социальные">Социальные</button>
-        <button class="tab" data-category="Коды">Коды</button>
+    <!-- Уведомление -->
+    <div class="notification" id="notification">
+        <span class="notification-icon">✅</span>
+        <span id="notificationText"></span>
     </div>
 
-    <div id="tasks-container">
-        <div class="loading">Загрузка заданий...</div>
+    <!-- Контейнер -->
+    <div class="app-container">
+        <div class="header">
+            <button class="burger-btn" onclick="openMenu()">☰</button>
+            <div class="logo">L1GA<span>PASS</span></div>
+            <div class="user-avatar" onclick="showPage('profile')">
+                <span id="userAvatarIcon">👤</span>
+            </div>
+        </div>
+
+        <!-- Страница: Профиль -->
+        <div class="page" id="page-profile">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <span id="profileAvatarIcon">👤</span>
+                </div>
+                <div class="profile-id" id="profileId">#12345678</div>
+                <div class="profile-name" id="profileName">kwke</div>
+            </div>
+
+            <div class="balance-card">
+                <div class="balance-label">LIGA COIN</div>
+                <div class="balance-amount">
+                    💰 <span id="profileBalance">0</span>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Активировано кодов</div>
+                    <div class="stat-value" id="statCodes">0</div>
+                </div>
+                <div class="stat-card stat-rank">
+                    <div class="stat-label">Рейтинг</div>
+                    <div class="stat-value" id="statRank">#999</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Завершено</div>
+                    <div class="stat-value" id="statCompleted">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Стоимость рюкзака</div>
+                    <div class="stat-value" style="font-size: 18px">💰 <span id="statValue">0</span></div>
+                </div>
+            </div>
+
+            <button class="btn-profile">Редактировать профиль</button>
+            <button class="btn-profile">Открыть рюкзак</button>
+        </div>
+
+        <!-- Страница: Задания -->
+        <div class="page active" id="page-tasks">
+            <h1>Задания</h1>
+
+            <div class="tabs">
+                <button class="tab active" data-category="all">Все</button>
+                <button class="tab" data-category="CS2">CS2</button>
+                <button class="tab" data-category="Dota 2">Dota 2</button>
+                <button class="tab" data-category="Социальные">Социальные</button>
+                <button class="tab" data-category="Коды">Коды</button>
+            </div>
+
+            <div id="tasks-container"></div>
+        </div>
+
+        <!-- Другие страницы (заглушки) -->
+        <div class="page" id="page-season">
+            <h1>Season Pass</h1>
+            <div style="text-align: center; padding: 60px 20px; color: #aaa;">
+                <div style="font-size: 80px; margin-bottom: 20px;">🎫</div>
+                <div>Скоро здесь появится Season Pass</div>
+            </div>
+        </div>
+
+        <div class="page" id="page-shop">
+            <h1>Магазин</h1>
+            <div style="text-align: center; padding: 60px 20px; color: #aaa;">
+                <div style="font-size: 80px; margin-bottom: 20px;">🛒</div>
+                <div>Магазин в разработке</div>
+            </div>
+        </div>
+
+        <div class="page" id="page-rating">
+            <h1>Рейтинг</h1>
+            <div style="text-align: center; padding: 60px 20px; color: #aaa;">
+                <div style="font-size: 80px; margin-bottom: 20px;">🏆</div>
+                <div>Таблица лидеров скоро</div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -280,45 +566,96 @@
 
         let userData = {
             balance: 0,
-            completedTasks: []
+            completedTasks: [],
+            codesActivated: 0,
+            rank: 999,
+            backpackValue: 0
         };
 
         let allTasks = [];
         let currentCategory = 'all';
 
+        // Меню
+        function openMenu() {
+            document.getElementById('menuOverlay').classList.add('active');
+            document.getElementById('menuBackdrop').classList.add('active');
+        }
+
+        function closeMenu() {
+            document.getElementById('menuOverlay').classList.remove('active');
+            document.getElementById('menuBackdrop').classList.remove('active');
+        }
+
+        // Переключение страниц
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(`page-${pageName}`).classList.add('active');
+            
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            document.querySelector(`[data-page="${pageName}"]`)?.classList.add('active');
+            
+            closeMenu();
+            
+            if (pageName === 'profile') {
+                updateProfile();
+            }
+        }
+
+        // Уведомления
+        function showNotification(text, icon = '✅') {
+            const notification = document.getElementById('notification');
+            const iconEl = notification.querySelector('.notification-icon');
+            const textEl = document.getElementById('notificationText');
+            
+            iconEl.textContent = icon;
+            textEl.textContent = text;
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
         // Инициализация
         async function init() {
-            const userId = tg.initDataUnsafe?.user?.id;
+            const user = tg.initDataUnsafe?.user;
             
-            if (!userId) {
-                console.error('Не удалось получить ID пользователя');
-                return;
+            if (user) {
+                const emoji = user.first_name?.[0] || '👤';
+                document.getElementById('userAvatarIcon').textContent = emoji;
+                document.getElementById('profileAvatarIcon').textContent = emoji;
+                document.getElementById('profileName').textContent = user.first_name || 'User';
+                document.getElementById('profileId').textContent = `#${user.id}`;
             }
 
-            // Загружаем данные пользователя
-            await loadUserData(userId);
-            
-            // Загружаем задания
+            await loadUserData();
             await loadTasks();
-            
-            // Отображаем задания
             renderTasks();
+            updateProfile();
         }
 
-        // Загрузка данных пользователя (здесь должен быть запрос к твоему боту)
-        async function loadUserData(userId) {
-            // Временные данные для демо
+        async function loadUserData() {
             userData = {
-                balance: 3000,
-                completedTasks: []
+                balance: 17610,
+                completedTasks: [],
+                codesActivated: 295,
+                rank: 186,
+                backpackValue: 3040000
             };
             
-            document.getElementById('balance').textContent = userData.balance;
+            updateProfile();
         }
 
-        // Загрузка заданий
+        function updateProfile() {
+            document.getElementById('profileBalance').textContent = userData.balance.toLocaleString();
+            document.getElementById('statCodes').textContent = userData.codesActivated;
+            document.getElementById('statRank').textContent = `#${userData.rank}`;
+            document.getElementById('statCompleted').textContent = userData.completedTasks.length;
+            document.getElementById('statValue').textContent = userData.backpackValue.toLocaleString();
+        }
+
         async function loadTasks() {
-            // Демо данные - замени на реальный API запрос
             allTasks = [
                 {
                     id: 'task_1',
@@ -326,10 +663,7 @@
                     description: 'Сделай свою первую ставку на любое событие',
                     reward: 200,
                     category: 'CS2',
-                    icon: '🎮',
-                    status: 'on-pause',
-                    progress: 0,
-                    total: 1
+                    icon: '🎮'
                 },
                 {
                     id: 'task_2',
@@ -337,10 +671,7 @@
                     description: 'Поделись нашим ботом с друзьями',
                     reward: 150,
                     category: 'Социальные',
-                    icon: '📱',
-                    status: 'active',
-                    progress: 0,
-                    total: 1
+                    icon: '📱'
                 },
                 {
                     id: 'task_3',
@@ -348,15 +679,11 @@
                     description: 'Участвуй в турнире и выиграй призы',
                     reward: 500,
                     category: 'Dota 2',
-                    icon: '🏆',
-                    status: 'active',
-                    progress: 2,
-                    total: 5
+                    icon: '🏆'
                 }
             ];
         }
 
-        // Отображение заданий
         function renderTasks() {
             const container = document.getElementById('tasks-container');
             
@@ -366,8 +693,8 @@
             
             if (filteredTasks.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📋</div>
+                    <div style="text-align: center; padding: 60px 20px; color: #aaa;">
+                        <div style="font-size: 80px; margin-bottom: 20px;">📋</div>
                         <div>Нет заданий в этой категории</div>
                     </div>
                 `;
@@ -376,82 +703,48 @@
 
             container.innerHTML = filteredTasks.map(task => {
                 const isCompleted = userData.completedTasks.includes(task.id);
-                const progressPercent = Math.round((task.progress / task.total) * 100);
                 
                 return `
-                    <div class="task-card ${isCompleted ? 'completed' : ''}" onclick="openTask('${task.id}')">
+                    <div class="task-card ${isCompleted ? 'completed' : ''}">
                         <div class="task-image ${task.icon === '💰' ? 'reward' : ''}">
                             <div class="reward-badge">💰 ${task.reward}</div>
                             <span style="font-size: 80px">${task.icon}</span>
                         </div>
                         
                         <div class="task-info">
-                            <div class="task-reward">
-                                💰 ${task.reward}
-                            </div>
-                            ${task.status === 'on-pause' ? `
-                                <div class="task-status on-pause">❌ На паузе</div>
-                            ` : ''}
-                            ${isCompleted ? `
-                                <div class="task-status completed-status">✅ Выполнено</div>
-                            ` : ''}
+                            <div class="task-reward">💰 ${task.reward}</div>
+                            ${isCompleted ? `<div class="task-status completed-status">✅ Выполнено</div>` : ''}
                         </div>
                         
                         <div class="task-title">${task.title}</div>
                         <div class="task-description">${task.description}</div>
                         
-                        ${task.total > 1 ? `
-                            <div class="task-progress">
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: ${progressPercent}%"></div>
-                                </div>
-                                <span>${progressPercent}%</span>
-                            </div>
-                        ` : ''}
-                        
-                        ${!isCompleted && task.status !== 'on-pause' ? `
-                            <button class="btn btn-primary" onclick="completeTask('${task.id}', event)">
+                        ${!isCompleted ? `
+                            <button class="btn btn-primary" onclick="completeTask('${task.id}')">
                                 Выполнить
                             </button>
-                        ` : ''}
-                        ${isCompleted ? `
-                            <button class="btn btn-disabled">
-                                ✅ Выполнено
-                            </button>
-                        ` : ''}
+                        ` : `
+                            <button class="btn btn-disabled">✅ Выполнено</button>
+                        `}
                     </div>
                 `;
             }).join('');
         }
 
-        // Открыть детали задания
-        function openTask(taskId) {
-            const task = allTasks.find(t => t.id === taskId);
-            if (task) {
-                tg.showAlert(`${task.title}\n\n${task.description}\n\nНаграда: ${task.reward} монет`);
-            }
-        }
-
-        // Выполнить задание
-        async function completeTask(taskId, event) {
-            event.stopPropagation();
-            
+        async function completeTask(taskId) {
             const task = allTasks.find(t => t.id === taskId);
             if (!task) return;
             
-            // Здесь должен быть запрос к твоему боту
-            // Для демо просто обновляем локально
             userData.completedTasks.push(taskId);
             userData.balance += task.reward;
             
-            document.getElementById('balance').textContent = userData.balance;
-            
-            tg.showAlert(`✅ Задание выполнено!\n\n+${task.reward} монет`);
-            
+            updateProfile();
             renderTasks();
+            
+            showNotification(`Задание выполнено! +${task.reward} монет`, '✅');
         }
 
-        // Переключение табов
+        // Табы
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -461,7 +754,13 @@
             });
         });
 
-        // Запуск
+        // Меню навигация
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                showPage(item.dataset.page);
+            });
+        });
+
         init();
     </script>
 </body>

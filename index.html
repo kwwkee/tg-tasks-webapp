@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Задания</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1f3a 0%, #2d3561 100%);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            background: #00ff88;
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 6px;
+            margin-left: 5px;
+        }
+
+        .balance {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 255, 136, 0.1);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .balance::before {
+            content: '💰';
+            font-size: 20px;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .tab {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+        }
+
+        .task-card {
+            background: linear-gradient(135deg, #2a3555 0%, #1f2744 100%);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .task-card:active {
+            transform: scale(0.98);
+        }
+
+        .task-card.completed {
+            opacity: 0.6;
+        }
+
+        .task-image {
+            width: 100%;
+            height: 180px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-size: 60px;
+            position: relative;
+        }
+
+        .task-image.reward {
+            background: linear-gradient(135deg, #c6ea00 0%, #a0b900 100%);
+        }
+
+        .task-image .reward-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .task-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .task-reward {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 255, 136, 0.2);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .task-status {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .task-status.on-pause {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+
+        .task-status.completed-status {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .task-progress {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #00ff88;
+            transition: width 0.3s;
+        }
+
+        .task-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+
+        .task-description {
+            color: #aaa;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #00ff88;
+            color: #000;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.95);
+        }
+
+        .btn-disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #aaa;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+        }
+
+        .empty-state-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            L1GA<span>PASS</span>
+        </div>
+        <div class="balance" id="balance">0</div>
+    </div>
+
+    <h1>Задания</h1>
+
+    <div class="tabs">
+        <button class="tab active" data-category="all">Все</button>
+        <button class="tab" data-category="CS2">CS2</button>
+        <button class="tab" data-category="Dota 2">Dota 2</button>
+        <button class="tab" data-category="Социальные">Социальные</button>
+        <button class="tab" data-category="Коды">Коды</button>
+    </div>
+
+    <div id="tasks-container">
+        <div class="loading">Загрузка заданий...</div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.setHeaderColor('#1a1f3a');
+        tg.setBackgroundColor('#1a1f3a');
+
+        let userData = {
+            balance: 0,
+            completedTasks: []
+        };
+
+        let allTasks = [];
+        let currentCategory = 'all';
+
+        // Инициализация
+        async function init() {
+            const userId = tg.initDataUnsafe?.user?.id;
+            
+            if (!userId) {
+                console.error('Не удалось получить ID пользователя');
+                return;
+            }
+
+            // Загружаем данные пользователя
+            await loadUserData(userId);
+            
+            // Загружаем задания
+            await loadTasks();
+            
+            // Отображаем задания
+            renderTasks();
+        }
+
+        // Загрузка данных пользователя (здесь должен быть запрос к твоему боту)
+        async function loadUserData(userId) {
+            // Временные данные для демо
+            userData = {
+                balance: 3000,
+                completedTasks: []
+            };
+            
+            document.getElementById('balance').textContent = userData.balance;
+        }
+
+        // Загрузка заданий
+        async function loadTasks() {
+            // Демо данные - замени на реальный API запрос
+            allTasks = [
+                {
+                    id: 'task_1',
+                    title: 'Приветственное задание: Первая ставка',
+                    description: 'Сделай свою первую ставку на любое событие',
+                    reward: 200,
+                    category: 'CS2',
+                    icon: '🎮',
+                    status: 'on-pause',
+                    progress: 0,
+                    total: 1
+                },
+                {
+                    id: 'task_2',
+                    title: 'Поделись в соцсетях',
+                    description: 'Поделись нашим ботом с друзьями',
+                    reward: 150,
+                    category: 'Социальные',
+                    icon: '📱',
+                    status: 'active',
+                    progress: 0,
+                    total: 1
+                },
+                {
+                    id: 'task_3',
+                    title: 'Турнир недели',
+                    description: 'Участвуй в турнире и выиграй призы',
+                    reward: 500,
+                    category: 'Dota 2',
+                    icon: '🏆',
+                    status: 'active',
+                    progress: 2,
+                    total: 5
+                }
+            ];
+        }
+
+        // Отображение заданий
+        function renderTasks() {
+            const container = document.getElementById('tasks-container');
+            
+            const filteredTasks = currentCategory === 'all' 
+                ? allTasks 
+                : allTasks.filter(t => t.category === currentCategory);
+            
+            if (filteredTasks.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <div>Нет заданий в этой категории</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredTasks.map(task => {
+                const isCompleted = userData.completedTasks.includes(task.id);
+                const progressPercent = Math.round((task.progress / task.total) * 100);
+                
+                return `
+                    <div class="task-card ${isCompleted ? 'completed' : ''}" onclick="openTask('${task.id}')">
+                        <div class="task-image ${task.icon === '💰' ? 'reward' : ''}">
+                            <div class="reward-badge">💰 ${task.reward}</div>
+                            <span style="font-size: 80px">${task.icon}</span>
+                        </div>
+                        
+                        <div class="task-info">
+                            <div class="task-reward">
+                                💰 ${task.reward}
+                            </div>
+                            ${task.status === 'on-pause' ? `
+                                <div class="task-status on-pause">❌ На паузе</div>
+                            ` : ''}
+                            ${isCompleted ? `
+                                <div class="task-status completed-status">✅ Выполнено</div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-description">${task.description}</div>
+                        
+                        ${task.total > 1 ? `
+                            <div class="task-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                                </div>
+                                <span>${progressPercent}%</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${!isCompleted && task.status !== 'on-pause' ? `
+                            <button class="btn btn-primary" onclick="completeTask('${task.id}', event)">
+                                Выполнить
+                            </button>
+                        ` : ''}
+                        ${isCompleted ? `
+                            <button class="btn btn-disabled">
+                                ✅ Выполнено
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Открыть детали задания
+        function openTask(taskId) {
+            const task = allTasks.find(t => t.id === taskId);
+            if (task) {
+                tg.showAlert(`${task.title}\n\n${task.description}\n\nНаграда: ${task.reward} монет`);
+            }
+        }
+
+        // Выполнить задание
+        async function completeTask(taskId, event) {
+            event.stopPropagation();
+            
+            const task = allTasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            // Здесь должен быть запрос к твоему боту
+            // Для демо просто обновляем локально
+            userData.completedTasks.push(taskId);
+            userData.balance += task.reward;
+            
+            document.getElementById('balance').textContent = userData.balance;
+            
+            tg.showAlert(`✅ Задание выполнено!\n\n+${task.reward} монет`);
+            
+            renderTasks();
+        }
+
+        // Переключение табов
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentCategory = tab.dataset.category;
+                renderTasks();
+            });
+        });
+
+        // Запуск
+        init();
+    </script>
+</body>
+</html>

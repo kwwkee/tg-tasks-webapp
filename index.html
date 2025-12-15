@@ -20,7 +20,88 @@
             overflow-x: hidden;
         }
 
-        /* Бургер меню */
+        /* Модальное окно регистрации */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #2a3555 0%, #1f2744 100%);
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .modal-text {
+            color: #aaa;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            text-align: left;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: #00ff88;
+            background: rgba(255,255,255,0.15);
+        }
+
+        .input-error {
+            border-color: #ff4444;
+        }
+
+        .error-text {
+            color: #ff4444;
+            font-size: 14px;
+            margin-top: 8px;
+            text-align: left;
+        }
+
+        /* Меню */
         .menu-overlay {
             position: fixed;
             top: 0;
@@ -101,7 +182,7 @@
             font-weight: 500;
         }
 
-        /* Контейнер приложения */
+        /* Контейнер */
         .app-container {
             padding: 20px;
             min-height: 100vh;
@@ -240,23 +321,6 @@
             font-weight: bold;
         }
 
-        .stat-rank {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .btn-profile {
-            width: 100%;
-            padding: 15px;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            border-radius: 12px;
-            color: #fff;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
         /* Задания */
         h1 {
             font-size: 32px;
@@ -293,18 +357,12 @@
             border-radius: 20px;
             padding: 20px;
             margin-bottom: 15px;
-            position: relative;
-            overflow: hidden;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s;
         }
 
         .task-card:active {
             transform: scale(0.98);
-        }
-
-        .task-card.completed {
-            opacity: 0.6;
         }
 
         .task-image {
@@ -320,10 +378,6 @@
             position: relative;
         }
 
-        .task-image.reward {
-            background: linear-gradient(135deg, #c6ea00 0%, #a0b900 100%);
-        }
-
         .task-image .reward-badge {
             position: absolute;
             top: 15px;
@@ -333,9 +387,6 @@
             border-radius: 10px;
             font-size: 16px;
             font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 5px;
         }
 
         .task-info {
@@ -343,6 +394,7 @@
             align-items: center;
             gap: 10px;
             margin-bottom: 10px;
+            flex-wrap: wrap;
         }
 
         .task-reward {
@@ -362,9 +414,19 @@
             font-weight: 600;
         }
 
-        .task-status.completed-status {
+        .task-status.completed {
             background: rgba(0, 255, 136, 0.2);
             color: #00ff88;
+        }
+
+        .task-status.checking {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+        }
+
+        .task-status.pending {
+            background: rgba(100, 100, 255, 0.2);
+            color: #6464ff;
         }
 
         .task-title {
@@ -396,7 +458,17 @@
             color: #000;
         }
 
-        .btn-primary:active {
+        .btn-secondary {
+            background: rgba(100, 100, 255, 0.3);
+            color: #fff;
+        }
+
+        .btn-warning {
+            background: rgba(255, 165, 0, 0.3);
+            color: #fff;
+        }
+
+        .btn:active {
             transform: scale(0.95);
         }
 
@@ -426,12 +498,46 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        .notification-icon {
-            font-size: 24px;
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #aaa;
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid #00ff88;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
+    <!-- Модальное окно регистрации -->
+    <div class="modal" id="registrationModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-icon">👋</div>
+            <div class="modal-title">Добро пожаловать!</div>
+            <div class="modal-text">Придумай свой уникальный никнейм</div>
+            
+            <div class="input-group">
+                <label class="input-label">Никнейм</label>
+                <input type="text" class="input" id="nicknameInput" placeholder="Введи ник" maxlength="20">
+                <div class="error-text" id="nicknameError" style="display: none;"></div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="createProfile()">Создать профиль</button>
+        </div>
+    </div>
+
     <!-- Меню -->
     <div class="menu-backdrop" id="menuBackdrop" onclick="closeMenu()"></div>
     <div class="menu-overlay" id="menuOverlay">
@@ -445,18 +551,6 @@
             <div class="menu-item" data-page="profile">
                 <span class="menu-item-icon">👤</span>
                 <span class="menu-item-text">Профиль</span>
-            </div>
-            <div class="menu-item" data-page="season">
-                <span class="menu-item-icon">🎫</span>
-                <span class="menu-item-text">Season Pass</span>
-            </div>
-            <div class="menu-item" data-page="shop">
-                <span class="menu-item-icon">🛒</span>
-                <span class="menu-item-text">Магазин</span>
-            </div>
-            <div class="menu-item" data-page="rating">
-                <span class="menu-item-icon">🏆</span>
-                <span class="menu-item-text">Рейтинг</span>
             </div>
         </div>
     </div>
@@ -484,7 +578,7 @@
                     <span id="profileAvatarIcon">👤</span>
                 </div>
                 <div class="profile-id" id="profileId">#12345678</div>
-                <div class="profile-name" id="profileName">kwke</div>
+                <div class="profile-name" id="profileName">Loading...</div>
             </div>
 
             <div class="balance-card">
@@ -496,25 +590,14 @@
 
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-label">Активировано кодов</div>
-                    <div class="stat-value" id="statCodes">0</div>
-                </div>
-                <div class="stat-card stat-rank">
-                    <div class="stat-label">Рейтинг</div>
-                    <div class="stat-value" id="statRank">#999</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Завершено</div>
+                    <div class="stat-label">Завершено заданий</div>
                     <div class="stat-value" id="statCompleted">0</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Стоимость рюкзака</div>
-                    <div class="stat-value" style="font-size: 18px">💰 <span id="statValue">0</span></div>
+                    <div class="stat-label">На проверке</div>
+                    <div class="stat-value" id="statChecking">0</div>
                 </div>
             </div>
-
-            <button class="btn-profile">Редактировать профиль</button>
-            <button class="btn-profile">Открыть рюкзак</button>
         </div>
 
         <!-- Страница: Задания -->
@@ -526,34 +609,13 @@
                 <button class="tab" data-category="CS2">CS2</button>
                 <button class="tab" data-category="Dota 2">Dota 2</button>
                 <button class="tab" data-category="Социальные">Социальные</button>
-                <button class="tab" data-category="Коды">Коды</button>
             </div>
 
-            <div id="tasks-container"></div>
-        </div>
-
-        <!-- Другие страницы (заглушки) -->
-        <div class="page" id="page-season">
-            <h1>Season Pass</h1>
-            <div style="text-align: center; padding: 60px 20px; color: #aaa;">
-                <div style="font-size: 80px; margin-bottom: 20px;">🎫</div>
-                <div>Скоро здесь появится Season Pass</div>
-            </div>
-        </div>
-
-        <div class="page" id="page-shop">
-            <h1>Магазин</h1>
-            <div style="text-align: center; padding: 60px 20px; color: #aaa;">
-                <div style="font-size: 80px; margin-bottom: 20px;">🛒</div>
-                <div>Магазин в разработке</div>
-            </div>
-        </div>
-
-        <div class="page" id="page-rating">
-            <h1>Рейтинг</h1>
-            <div style="text-align: center; padding: 60px 20px; color: #aaa;">
-                <div style="font-size: 80px; margin-bottom: 20px;">🏆</div>
-                <div>Таблица лидеров скоро</div>
+            <div id="tasks-container">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    Загрузка заданий...
+                </div>
             </div>
         </div>
     </div>
@@ -564,16 +626,12 @@
         tg.setHeaderColor('#1a1f3a');
         tg.setBackgroundColor('#1a1f3a');
 
-        let userData = {
-            balance: 0,
-            completedTasks: [],
-            codesActivated: 0,
-            rank: 999,
-            backpackValue: 0
-        };
-
+        const API_URL = 'http://localhost:3000/api';
+        
+        let userData = null;
         let allTasks = [];
         let currentCategory = 'all';
+        let telegramId = null;
 
         // Меню
         function openMenu() {
@@ -604,12 +662,8 @@
         // Уведомления
         function showNotification(text, icon = '✅') {
             const notification = document.getElementById('notification');
-            const iconEl = notification.querySelector('.notification-icon');
-            const textEl = document.getElementById('notificationText');
-            
-            iconEl.textContent = icon;
-            textEl.textContent = text;
-            
+            notification.querySelector('.notification-icon').textContent = icon;
+            document.getElementById('notificationText').textContent = text;
             notification.classList.add('show');
             
             setTimeout(() => {
@@ -617,71 +671,93 @@
             }, 3000);
         }
 
-        // Инициализация
-        async function init() {
-            const user = tg.initDataUnsafe?.user;
+        // Регистрация
+        async function createProfile() {
+            const nickname = document.getElementById('nicknameInput').value.trim();
+            const errorEl = document.getElementById('nicknameError');
+            const inputEl = document.getElementById('nicknameInput');
             
-            if (user) {
-                const emoji = user.first_name?.[0] || '👤';
-                document.getElementById('userAvatarIcon').textContent = emoji;
-                document.getElementById('profileAvatarIcon').textContent = emoji;
-                document.getElementById('profileName').textContent = user.first_name || 'User';
-                document.getElementById('profileId').textContent = `#${user.id}`;
+            if (!nickname) {
+                errorEl.textContent = 'Введи никнейм';
+                errorEl.style.display = 'block';
+                inputEl.classList.add('input-error');
+                return;
+            }
+            
+            if (nickname.length < 3) {
+                errorEl.textContent = 'Минимум 3 символа';
+                errorEl.style.display = 'block';
+                inputEl.classList.add('input-error');
+                return;
             }
 
-            await loadUserData();
-            await loadTasks();
-            renderTasks();
-            updateProfile();
+            try {
+                const response = await fetch(`${API_URL}/user/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegramId, nickname })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('registrationModal').style.display = 'none';
+                    await init();
+                    showNotification('Профиль создан! 🎉');
+                } else {
+                    errorEl.textContent = result.error;
+                    errorEl.style.display = 'block';
+                    inputEl.classList.add('input-error');
+                }
+            } catch (err) {
+                errorEl.textContent = 'Ошибка сервера';
+                errorEl.style.display = 'block';
+                inputEl.classList.add('input-error');
+            }
         }
 
+        // Загрузка данных пользователя
         async function loadUserData() {
-            userData = {
-                balance: 17610,
-                completedTasks: [],
-                codesActivated: 295,
-                rank: 186,
-                backpackValue: 3040000
-            };
-            
-            updateProfile();
+            try {
+                const response = await fetch(`${API_URL}/user/${telegramId}`);
+                const data = await response.json();
+                
+                if (!data.exists) {
+                    document.getElementById('registrationModal').style.display = 'flex';
+                    return false;
+                }
+                
+                userData = data.user;
+                updateProfile();
+                return true;
+            } catch (err) {
+                console.error('Ошибка загрузки пользователя:', err);
+                return false;
+            }
         }
 
         function updateProfile() {
-            document.getElementById('profileBalance').textContent = userData.balance.toLocaleString();
-            document.getElementById('statCodes').textContent = userData.codesActivated;
-            document.getElementById('statRank').textContent = `#${userData.rank}`;
-            document.getElementById('statCompleted').textContent = userData.completedTasks.length;
-            document.getElementById('statValue').textContent = userData.backpackValue.toLocaleString();
+            if (!userData) return;
+            
+            document.getElementById('profileName').textContent = userData.nickname;
+            document.getElementById('profileId').textContent = `#${userData.telegram_id}`;
+            document.getElementById('profileBalance').textContent = userData.balance;
+            document.getElementById('statCompleted').textContent = userData.completedTasks || 0;
+            
+            const checking = allTasks.filter(t => t.user_status === 'checking').length;
+            document.getElementById('statChecking').textContent = checking;
         }
 
+        // Загрузка заданий
         async function loadTasks() {
-            allTasks = [
-                {
-                    id: 'task_1',
-                    title: 'Приветственное задание: Первая ставка',
-                    description: 'Сделай свою первую ставку на любое событие',
-                    reward: 200,
-                    category: 'CS2',
-                    icon: '🎮'
-                },
-                {
-                    id: 'task_2',
-                    title: 'Поделись в соцсетях',
-                    description: 'Поделись нашим ботом с друзьями',
-                    reward: 150,
-                    category: 'Социальные',
-                    icon: '📱'
-                },
-                {
-                    id: 'task_3',
-                    title: 'Турнир недели',
-                    description: 'Участвуй в турнире и выиграй призы',
-                    reward: 500,
-                    category: 'Dota 2',
-                    icon: '🏆'
-                }
-            ];
+            try {
+                const response = await fetch(`${API_URL}/tasks/${telegramId}`);
+                const data = await response.json();
+                allTasks = data.tasks;
+                renderTasks();
+            } catch (err) {
+                console.error('Ошибка загрузки заданий:', err);
+            }
         }
 
         function renderTasks() {
@@ -702,46 +778,85 @@
             }
 
             container.innerHTML = filteredTasks.map(task => {
-                const isCompleted = userData.completedTasks.includes(task.id);
+                const status = task.user_status || 'new';
+                
+                let statusBadge = '';
+                let buttonHtml = '';
+                
+                if (status === 'completed') {
+                    statusBadge = '<div class="task-status completed">✅ Выполнено</div>';
+                    buttonHtml = '<button class="btn btn-disabled">✅ Выполнено</button>';
+                } else if (status === 'checking') {
+                    statusBadge = '<div class="task-status checking">⏳ На проверке</div>';
+                    buttonHtml = '<button class="btn btn-warning">⏳ Ожидает проверки</button>';
+                } else if (status === 'pending') {
+                    statusBadge = '<div class="task-status pending">📝 Принято</div>';
+                    buttonHtml = `<button class="btn btn-secondary" onclick="submitTask('${task.id}')">📤 Отправить на проверку</button>`;
+                } else {
+                    buttonHtml = `<button class="btn btn-primary" onclick="acceptTask('${task.id}')">✅ Принять задание</button>`;
+                }
                 
                 return `
-                    <div class="task-card ${isCompleted ? 'completed' : ''}">
-                        <div class="task-image ${task.icon === '💰' ? 'reward' : ''}">
+                    <div class="task-card">
+                        <div class="task-image">
                             <div class="reward-badge">💰 ${task.reward}</div>
                             <span style="font-size: 80px">${task.icon}</span>
                         </div>
                         
                         <div class="task-info">
                             <div class="task-reward">💰 ${task.reward}</div>
-                            ${isCompleted ? `<div class="task-status completed-status">✅ Выполнено</div>` : ''}
+                            ${statusBadge}
                         </div>
                         
                         <div class="task-title">${task.title}</div>
                         <div class="task-description">${task.description}</div>
                         
-                        ${!isCompleted ? `
-                            <button class="btn btn-primary" onclick="completeTask('${task.id}')">
-                                Выполнить
-                            </button>
-                        ` : `
-                            <button class="btn btn-disabled">✅ Выполнено</button>
-                        `}
+                        ${buttonHtml}
                     </div>
                 `;
             }).join('');
         }
 
-        async function completeTask(taskId) {
-            const task = allTasks.find(t => t.id === taskId);
-            if (!task) return;
-            
-            userData.completedTasks.push(taskId);
-            userData.balance += task.reward;
-            
-            updateProfile();
-            renderTasks();
-            
-            showNotification(`Задание выполнено! +${task.reward} монет`, '✅');
+        async function acceptTask(taskId) {
+            try {
+                const response = await fetch(`${API_URL}/task/accept`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegramId, taskId })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    await loadTasks();
+                    showNotification('Задание принято! Выполни его и отправь на проверку', '📝');
+                } else {
+                    showNotification(result.error, '❌');
+                }
+            } catch (err) {
+                showNotification('Ошибка сервера', '❌');
+            }
+        }
+
+        async function submitTask(taskId) {
+            try {
+                const response = await fetch(`${API_URL}/task/submit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegramId, taskId })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    await loadTasks();
+                    showNotification('Задание отправлено на проверку! ⏳', '📤');
+                } else {
+                    showNotification(result.error, '❌');
+                }
+            } catch (err) {
+                showNotification('Ошибка сервера', '❌');
+            }
         }
 
         // Табы
@@ -760,6 +875,28 @@
                 showPage(item.dataset.page);
             });
         });
+
+        // Инициализация
+        async function init() {
+            const user = tg.initDataUnsafe?.user;
+            
+            if (user) {
+                telegramId = user.id;
+                const emoji = user.first_name?.[0] || '👤';
+                document.getElementById('userAvatarIcon').textContent = emoji;
+                document.getElementById('profileAvatarIcon').textContent = emoji;
+                
+                const userLoaded = await loadUserData();
+                if (userLoaded) {
+                    await loadTasks();
+                }
+            } else {
+                // Для теста без Telegram
+                telegramId = 123456789;
+                await loadUserData();
+                await loadTasks();
+            }
+        }
 
         init();
     </script>

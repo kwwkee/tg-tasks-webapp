@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - L1GA PASS</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="admin-css/admin-styles.css">
+</head>
+<body>
+    <div class="admin-container">
+        <div class="header">
+            <div class="header-title">⚙️ Admin Panel</div>
+            <div class="header-badge" id="pendingBadge">0 на проверке</div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showSection('dashboard')">📊 Dashboard</button>
+            <button class="tab" onclick="showSection('users')">👥 Пользователи</button>
+            <button class="tab" onclick="showSection('tasks')">🎮 Задания</button>
+            <button class="tab" onclick="showSection('submissions')">📋 Проверка</button>
+            <button class="tab" onclick="showSection('codes')">🎫 Коды</button>
+            <button class="tab" onclick="showSection('shop')">🛒 Магазин</button>
+            <button class="tab" onclick="showSection('news')">📰 Новости</button>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="section active" id="section-dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalUsers">0</div>
+                    <div class="stat-label">Пользователей</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalTasks">0</div>
+                    <div class="stat-label">Заданий</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="pendingSubmissions">0</div>
+                    <div class="stat-label">На проверке</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalCodes">0</div>
+                    <div class="stat-label">Промокодов</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Пользователи -->
+        <div class="section" id="section-users">
+            <div class="card">
+                <div class="card-title">👥 Все пользователи</div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Никнейм</th>
+                            <th>Имя</th>
+                            <th>Username</th>
+                            <th>Баланс</th>
+                            <th>Дата</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Задания -->
+        <div class="section" id="section-tasks">
+            <div class="card">
+                <div class="card-title">➕ Добавить задание</div>
+                
+                <div class="input-group">
+                    <label class="input-label">Название</label>
+                    <input type="text" class="input" id="taskTitle" placeholder="Название">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Описание</label>
+                    <textarea class="textarea" id="taskDescription" placeholder="Описание"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Награда (монеты)</label>
+                    <input type="number" class="input" id="taskReward" placeholder="100">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Категория</label>
+                    <input type="text" class="input" id="taskCategory" placeholder="CS2">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Иконка</label>
+                    <div class="icon-picker" id="iconPicker"></div>
+                </div>
+
+                <button class="btn btn-primary" onclick="addTask()">Добавить задание</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📋 Все задания</div>
+                <div id="tasksContainer"></div>
+            </div>
+        </div>
+
+        <!-- Проверка -->
+        <div class="section" id="section-submissions">
+            <div class="card">
+                <div class="card-title">📋 Задания на проверке</div>
+                <div id="submissionsContainer"></div>
+            </div>
+        </div>
+
+        <!-- Промокоды -->
+        <div class="section" id="section-codes">
+            <div class="card">
+                <div class="card-title">➕ Создать промокод</div>
+                
+                <div class="input-group">
+                    <label class="input-label">Код</label>
+                    <input type="text" class="input" id="codeText" placeholder="PROMO2024" style="text-transform: uppercase;">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Награда (монеты)</label>
+                    <input type="number" class="input" id="codeReward" placeholder="500">
+                </div>
+
+                <button class="btn btn-primary" onclick="addCode()">Создать код</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🎫 Все промокоды</div>
+                <div id="codesContainer"></div>
+            </div>
+        </div>
+
+        <!-- Магазин -->
+        <div class="section" id="section-shop">
+            <div class="card">
+                <div class="card-title">➕ Добавить товар</div>
+                
+                <div class="input-group">
+                    <label class="input-label">Название</label>
+                    <input type="text" class="input" id="shopTitle" placeholder="Название">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Описание</label>
+                    <textarea class="textarea" id="shopDescription" placeholder="Описание"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Цена (монеты)</label>
+                    <input type="number" class="input" id="shopPrice" placeholder="1000">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Иконка</label>
+                    <input type="text" class="input" id="shopIcon" placeholder="🎁" maxlength="2">
+                </div>
+
+                <button class="btn btn-primary" onclick="addShopItem()">Добавить</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🛒 Все товары</div>
+                <div id="shopContainer"></div>
+            </div>
+        </div>
+
+        <!-- Новости -->
+        <div class="section" id="section-news">
+            <div class="card">
+                <div class="card-title">➕ Опубликовать новость</div>
+                
+                <div class="input-group">
+                    <label class="input-label">Заголовок</label>
+                    <input type="text" class="input" id="newsTitle" placeholder="Заголовок">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Содержание</label>
+                    <textarea class="textarea" id="newsContent" placeholder="Текст новости"></textarea>
+                </div>
+
+                <button class="btn btn-primary" onclick="addNews()">Опубликовать</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📰 Все новости</div>
+                <div id="newsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <span id="notificationText"></span>
+    </div>
+
+    <script src="admin-js/admin-storage.js"></script>
+    <script src="admin-js/admin-ui.js"></script>
+    <script src="admin-js/admin-app.js"></script>
+</body>
+</html>
